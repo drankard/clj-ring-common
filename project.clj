@@ -11,7 +11,7 @@
   :dev-dependencies
    [[com.stuartsierra/lazytest "1.1.2"]]
   :repl-init-script "init.clj" ; init.cjl  is not under version control. se sample-init.clj
-
+)
 (ns leiningen.lazytest
   (:import [java.io File])
   (:use [leiningen.compile :only [eval-in-project]]))

@@ -68,3 +68,7 @@
         (= data "") false 
         (= data "null")  false
         :else true))
+
+(defn route-not-found-text "return a string with : No Service defined with the given path" [] 
+  "No Service defined with the given path")
+
