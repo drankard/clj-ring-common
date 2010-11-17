@@ -1,0 +1,16 @@
+autodoc
+public/autodoc
+pom.xml
+*.swp
+*jar
+*war
+lib
+logs/*
+classes
+*~
+*.iml
+*iws
+*ipr
+.project
+*.orig
+init.clj
