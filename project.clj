@@ -9,16 +9,8 @@
                                                   com.sun.jdmk/jmxtools
                                                   com.sun.jmx/jmxri]]]
   :dev-dependencies
-   [[autodoc "0.7.1" :exclusions [enlive/enlive org.clojure/clojure-contrib]]
-   [org.ccil.cowan.tagsoup/tagsoup "1.2"]
-   [com.stuartsierra/lazytest "1.1.2"]]
+   [[com.stuartsierra/lazytest "1.1.2"]]
   :repl-init-script "init.clj" ; init.cjl  is not under version control. se sample-init.clj
-  :autodoc {
-                      :name "Clojure Ring Common"
-                      :description "Clojure Ring Common "
-                      :output-path "public/autodoc"}
-  )
-
 
 (ns leiningen.lazytest
   (:import [java.io File])
