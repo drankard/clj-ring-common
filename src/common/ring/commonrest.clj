@@ -1,4 +1,4 @@
-(ns kunde.commonrest (:use ring.util.response)
+(ns common.ring.commonrest (:use ring.util.response)
   (:require [clj-json.core :as json]
     [clojure.contrib.logging :as logging]
     [clojure.contrib.io :as io]))
@@ -62,7 +62,7 @@
 
 (defmacro chk "Used in :pre and :post condition for setting the right http-code for AssertionErrors, the func argument is evaluated. " [httpcode func & comment] `(do ~func))
 
-(defn is-empty? "returns a boolean, false if data = nil, {} \"\" " [data]
+(defn is-empty? "returns a boolean, false if data = nil, {}, \"\" or \"null\" otherwise true " [data]
     (cond (empty? data) false  
         (= data "{}") false
         (= data "") false 
