@@ -9,9 +9,12 @@
                                                   com.sun.jdmk/jmxtools
                                                   com.sun.jmx/jmxri]]]
   :dev-dependencies
-   [[com.stuartsierra/lazytest "1.1.2"]]
+   [[lein-clojars "0.6.0"]
+    [com.stuartsierra/lazytest "1.1.2"]
+    ]
   :repl-init-script "init.clj" ; init.cjl  is not under version control. se sample-init.clj
-)
+  :repositories {"stuartsierra-releases" "http://stuartsierra.com/maven2"})
+
 (ns leiningen.lazytest
   (:import [java.io File])
   (:use [leiningen.compile :only [eval-in-project]]))
