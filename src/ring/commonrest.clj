@@ -1,4 +1,5 @@
-(ns common.ring.commonrest (:use ring.util.response)
+(ns ring.commonrest 
+  (:use ring.util.response [clojure.string :only (trim) ])
   (:require [clj-json.core :as json]
     [clojure.contrib.logging :as logging]
     [clojure.contrib.io :as io]))
@@ -28,8 +29,12 @@
 
 (defn- json-ex-response "returns a json response, if http-code is null, 400 is used." [exception httpcode]
   (-> (response (str {:exception (str exception)}))
-    (status (if (nil? httpcode) (400) (Integer/parseInt (str httpcode))))
+    (status (if (nil? httpcode) (400) (Integer/parseInt (trim httpcode))))
     (content-type "application/vnd.yousee+json")))
+
+(defn- find-error-code "" [text]
+  (re-find #"\s[0-9]{3}\s" (str text)))
+
 
 (defn- handle-req [app req]
   (try (app req)
@@ -67,6 +72,7 @@
         (= data "{}") false
         (= data "") false 
         (= data "null")  false
+        (= data "nil")  false
         :else true))
 
 (defn route-not-found-text "return a string with : No Service defined with the given path" [] 
