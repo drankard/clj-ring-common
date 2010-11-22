@@ -2,8 +2,16 @@
 
 Common wrappers for ring:
 
-promote-headers adds the headers to the params var.
+### wrap-promote-header
+Adds all the headers as lowercase and prefixed with 'header_' to the params var.
+This enables using headers a function arguments in routes.
 
+
+### wrap-request-log-and-error-handling 
+Logs the request and response with contrib.logging as INFO 
+Catches all the exception thrown and returns a json-object with the exception message. If java.lang.Exception a httpcode of 500 is used. If AssertionError - an custom httpcode of ? is returned, this error code is determined by the threadlocal var *error-code* (using set!) 
+
+The chk function, is used in pre and post condition for setting the error-code.
 
 ## Installation 
 in project.clj under dependencies add 

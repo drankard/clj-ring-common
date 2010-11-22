@@ -1,5 +1,5 @@
 (ns ring.commonrest 
-  (:use ring.util.response [clojure.string :only (trim) ])
+  (:use ring.util.response [clojure.string :only (trim lower-case) ])
   (:require [clj-json.core :as json]
     [clojure.contrib.logging :as logging]
     [clojure.contrib.io :as io]))
@@ -59,10 +59,22 @@
       resp)
     )
   )
-(defn wrap-promote-header "Takes the given headers and adds them to params; This makes routes with headers in functions arguments possible. 
-                          Ex. (GET '/somepath/:id' [id headertag] ...) headertag could be content-type, accept, uri, host, user-agent, content-length, character-encoding etc. "  [handler]
+
+(defn- convert-to-lowercase-prefix [data prefix]
+  (loop [result {} the-rest data ]
+      (if (empty? the-rest)
+        result
+        (let [c (first the-rest)]
+         (recur (assoc result (str prefix (lower-case (first c))) (last c)) (rest  the-rest))))))
+
+(defn wrap-promote-header "Takes the given headers and adds them to params, as lowercase and prefixed with header_ 
+                          This makes routes with headers in functions arguments possible. 
+                          Ex. (GET '/somepath/:id' [id headertag] ...) headertag could be :
+                          content-type, accept, uri, host, user-agent, content-length, character-encoding etc.
+                          IMPORTANT : This wrapper must be executed before wrap-json-params" 
+  [handler]
   (fn [request]
-        (let [request* (assoc request :params (merge (:params request) (:headers request) ))] 
+        (let [request* (assoc request :params (merge (:params request) (convert-to-lowercase-prefix (:headers request) "header_") ))] 
          (handler request*))))
 
 (defmacro chk "Used in :pre and :post condition for setting the right http-code for AssertionErrors, the func argument is evaluated. " [httpcode func & comment] `(do ~func))
