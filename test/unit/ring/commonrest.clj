@@ -25,9 +25,6 @@
          (it "All headers should be lowercase and prefixed with header_ "
              (= "header_content-length" (first (first (:params resp )))))))
 
-
-
-
 (describe "is-empty?"
           (it "nil-should-be-false"
               (false? ( c/is-empty? nil)))

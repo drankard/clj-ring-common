@@ -35,11 +35,12 @@
 (defn- find-error-code "" [text]
   (re-find #"\s[0-9]{3}\s" (str text)))
 
+; (def #^{:doc "Default httpcode for error handling via wrap-request-log-and-error-handling and chk "} *error-code* 500) 
 
 (defn- handle-req [app req]
   (try (app req)
     (catch Exception e (do (logging/error "exp caught" e) (json-ex-response e 500)))
-    (catch AssertionError e (do (logging/error "assertion caught" e) (json-ex-response e (re-find #"[0-9]{3}" (str e)))))))
+    (catch AssertionError e (do (logging/error "assertion caught" e) (json-ex-response e (find-error-code e))))))
 
 (defn wrap-request-log-and-error-handling
   "Wrap an app such that exceptions thrown within the wrapped app are caught
@@ -77,7 +78,7 @@
         (let [request* (assoc request :params (merge (:params request) (convert-to-lowercase-prefix (:headers request) "header_") ))] 
          (handler request*))))
 
-(defmacro chk "Used in :pre and :post condition for setting the right http-code for AssertionErrors, the func argument is evaluated. " [httpcode func & comment] `(do ~func))
+(defmacro chk "Used in :pre and :post condition for setting the right http-code for AssertionErrors, the func argument is evaluated. " [^Integer httpcode func & comment] `(do ~func))
 
 (defn is-empty? "returns a boolean, false if data = nil, {}, \"\" or \"null\" otherwise true " [data]
     (cond (empty? data) false  
