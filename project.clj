@@ -10,38 +10,10 @@
                                                   com.sun.jmx/jmxri]]]
   :dev-dependencies
    [[lein-clojars "0.6.0"]
+    [lein-lazytest "1.0.1"]
     [com.stuartsierra/lazytest "1.1.2"]
     ]
+  :lazytest-path ["src" "test"]            
   :repl-init-script "init.clj" ; init.cjl  is not under version control. se sample-init.clj
   :repositories {"stuartsierra-releases" "http://stuartsierra.com/maven2"})
 
-(ns leiningen.lazytest
-  (:import [java.io File])
-  (:use [leiningen.compile :only [eval-in-project]]))
-
-  (defn lazytest
-    ([project] (lazytest project ""))
-    ([project re]
-      (eval-in-project
-        project
-        `(do
-          (let [files# (map
-            #(. % getPath)
-            (file-seq (new File "test")))]
-            (require 'lazytest.report.nested)
-            (require 'lazytest.runner.console)
-            (doseq [x# files#]
-              (if (re-find #"clj$" x#)
-                (load-file x#))))
-          (let [pat# (re-pattern (str "unit.*" ~re))]
-            (doseq [tns# (filter
-              #(re-find pat# (str %))
-              (all-ns))]
-              (lazytest.report.nested/report
-	       (lazytest.runner.console/run-tests tns#))))
-	  (let [pat# (re-pattern (str "component.*" ~re))]
-            (doseq [tns# (filter
-              #(re-find pat# (str %))
-              (all-ns))]
-              (lazytest.report.nested/report
-	       (lazytest.runner.console/run-tests tns#))))))))
