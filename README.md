@@ -13,7 +13,7 @@ Catches all the exception thrown and returns a json-object with the exception me
 
 The chk function, is used in pre and post condition for setting the httpcode.
 In the example below, the httpcode is set to 400 or 404. The value is used by the wrap-request-log-and-error-handling
-   (defn somefunc "function called directly from a ring route" 
+    (defn somefunc "function called directly from a ring route" 
 	{:pre [(chk 400 (not (empty? username)))]
          :post [(chk 404 (is-empty?  %))]}
     [username] (username))    
