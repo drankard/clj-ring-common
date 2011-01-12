@@ -22,7 +22,7 @@ In the example below, the httpcode is set to 400 or 404. The value is used by th
 ## Installation 
 in project.clj under dependencies add 
 
-[common-ring "1.0.0-SNAPSHOT"]
+[common-ring "1.0.0"]
 
 The jar is located at clojars.org
 
