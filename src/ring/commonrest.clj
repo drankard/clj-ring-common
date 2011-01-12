@@ -4,9 +4,10 @@
     [clojure.contrib.logging :as logging]
     [clojure.contrib.io :as io]))
 
-(defn json-response [data & [status]]
+(defn json-response "Data is the http body, status is optional httpcode and content-type is ex. application/vnd.yoursee+json" 
+  [data content-type & [status]]
   {:status (or status 200)
-   :headers {"Content-Type" "application/vnd.yousee+json"
+   :headers {"Content-Type" content-type 
              "ETag" (str (hash data))}
    :body (json/generate-string data)})
 
@@ -30,7 +31,7 @@
 (defn- json-ex-response "returns a json response, if http-code is null, 400 is used." [exception httpcode]
   (-> (response (str {:exception (str exception)}))
     (status (if (nil? httpcode) (400) (Integer/parseInt (trim httpcode))))
-    (content-type "application/vnd.yousee+json")))
+    (content-type "application/vnd.yousee.kasia2.error+json")))
 
 (defn- find-error-code "" [text]
   (re-find #"\s[0-9]{3}\s" (str text)))
