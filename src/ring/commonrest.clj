@@ -15,7 +15,7 @@
   (cond
     (nil? data) (json-response data content-type 404)
     (empty? data) (json-response data content-type  404)
-    (not (nil? data)) (json-response content-type data)))
+    (not (nil? data)) (json-response data content-type)))
 
 (defn put-json-response [ifmatch etag okfunc content-type]
   (cond
