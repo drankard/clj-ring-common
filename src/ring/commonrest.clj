@@ -11,16 +11,16 @@
              "ETag" (str (hash data))}
    :body (json/generate-string data)})
 
-(defn get-json-response [data]
+(defn get-json-response [data content-type]
   (cond
-    (nil? data) (json-response data 404)
-    (empty? data) (json-response data 404)
-    (not (nil? data)) (json-response data)))
+    (nil? data) (json-response data content-type 404)
+    (empty? data) (json-response data content-type  404)
+    (not (nil? data)) (json-response content-type data)))
 
-(defn put-json-response [ifmatch etag okfunc]
+(defn put-json-response [ifmatch etag okfunc content-type]
   (cond
-    (not (= ifmatch etag)) (json-response nil 409)
-    (= ifmatch etag) (json-response (eval okfunc) 204)))
+    (not (= ifmatch etag)) (json-response nil content-type 409)
+    (= ifmatch etag) (json-response (eval okfunc) content-type 204)))
 
 ; ################ pre and post condition and request wrapper ##################
 (defn- reqlog [msg & vals]
