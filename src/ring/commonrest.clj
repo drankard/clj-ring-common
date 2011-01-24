@@ -30,13 +30,11 @@
 
 (defn- json-ex-response "returns a json response, if http-code is null, 400 is used." [exception httpcode]
   (-> (response (str {:exception (str exception)}))
-    (status (if (nil? httpcode) (400) (Integer/parseInt (trim httpcode))))
+    (status (if (nil? httpcode) 400 (Integer/parseInt (trim httpcode))))
     (content-type "application/vnd.yousee.kasia2.error+json")))
 
 (defn- find-error-code "" [text]
   (re-find #"\s[0-9]{3}\s" (str text)))
-
-; (def #^{:doc "Default httpcode for error handling via wrap-request-log-and-error-handling and chk "} *error-code* 500) 
 
 (defn- handle-req [app req]
   (try (app req)
