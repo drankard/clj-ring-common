@@ -4,23 +4,13 @@
     [clojure.contrib.logging :as logging]
     [clojure.contrib.io :as io]))
 
-(defn json-response "Data is the http body, status is optional httpcode and content-type is ex. application/vnd.yoursee+json" 
-  [data content-type & [status]]
-  {:status (or status 200)
+(defn json-response
+  "Data is the http body, :status is optional httpcode, :etag is optional calculated etag value and content-type is ex. application/vnd.yoursee+json" 
+  [data content-type & {:as attrs}] 
+  {:status (or (:status attrs) 200)
    :headers {"Content-Type" content-type 
-             "ETag" (str (hash data))}
+             "ETag" (str (if (:etag attrs) (:etag attrs) (hash data)))}
    :body (json/generate-string data)})
-
-(defn get-json-response [data content-type]
-  (cond
-    (nil? data) (json-response data content-type 404)
-    (empty? data) (json-response data content-type  404)
-    (not (nil? data)) (json-response data content-type)))
-
-(defn put-json-response [ifmatch etag okfunc content-type]
-  (cond
-    (not (= ifmatch etag)) (json-response nil content-type 409)
-    (= ifmatch etag) (json-response (eval okfunc) content-type 204)))
 
 ; ################ pre and post condition and request wrapper ##################
 (defn- reqlog [msg & vals]
