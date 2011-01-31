@@ -9,7 +9,9 @@
   [data content-type & {:as attrs}] 
   {:status (or (:status attrs) 200)
    :headers {"Content-Type" content-type 
-             "ETag" (str (if (:etag attrs) (:etag attrs) (hash data)))}
+             "ETag" (str (if (:etag attrs) (:etag attrs) (hash data)))
+             "Cache-Control" (if (:cache-control attrs) (:cache-control attrs) "no-cache")
+             "Expires" (if (:expires attrs) (:expires attrs) "0")}
    :body (json/generate-string data)})
 
 ; ################ pre and post condition and request wrapper ##################
