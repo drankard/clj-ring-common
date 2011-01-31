@@ -5,14 +5,19 @@
     [clojure.contrib.io :as io]))
 
 (defn json-response
-  "Data is the http body, :status is optional httpcode, :etag is optional calculated etag value and content-type is ex. application/vnd.yoursee+json" 
+  "Data is the http body, :status is optional httpcode, :etag is optional calculated etag value and content-type is ex. application/vnd.yoursee+json. :cache-control and :expires are optional" 
   [data content-type & {:as attrs}] 
-  {:status (or (:status attrs) 200)
-   :headers {"Content-Type" content-type 
-             "ETag" (str (if (:etag attrs) (:etag attrs) (hash data)))
-             "Cache-Control" (if (:cache-control attrs) (:cache-control attrs) "no-cache")
-             "Expires" (if (:expires attrs) (:expires attrs) "0")}
-   :body (json/generate-string data)})
+  (let [res {:status (or (:status attrs) 200)
+             :headers {"Content-Type" content-type 
+                       "ETag" (str (if (:etag attrs) (:etag attrs) (hash data)))}
+             :body (json/generate-string data)}
+        res2 (if (:cache-control attrs)
+               (assoc-in res [:headers "Cache-Control"] (:cache-control attrs))
+               res)
+        res3 (if (:expires attrs)
+               (assoc-in res2 [:headers "Expires"] (:expires attrs))
+               res2)]
+    res3))
 
 ; ################ pre and post condition and request wrapper ##################
 (defn- reqlog [msg & vals]
