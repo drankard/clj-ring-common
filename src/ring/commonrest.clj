@@ -19,6 +19,11 @@
                res2)]
     res3))
 
+(defmacro try-catch-resp [ & e]
+  "try catch macro der returnerer java exp som json dokument og fejl 500"
+  `(try ~@e
+        (catch Exception a# (json-response { :error (str a#) } "application/vnd.yousee.kasia2.error+json" :status 500))))
+
 ; ################ pre and post condition and request wrapper ##################
 (defn- reqlog [msg & vals]
   (let [line (apply format msg vals)]
