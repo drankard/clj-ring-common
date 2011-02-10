@@ -81,12 +81,13 @@
 
 (defmacro chk "Used in :pre and :post condition for setting the right http-code for AssertionErrors, the func argument is evaluated. " [^Integer httpcode func & comment] `(do ~func))
 
-(defn is-empty? "returns a boolean, false if data = nil, {}, \"\" or \"null\" otherwise true " [data]
+(defn is-empty? "returns a boolean, false if data = nil, {}, [], \"\" or \"null\" otherwise true " [data]
     (cond (empty? data) false  
         (= data "{}") false
         (= data "") false 
         (= data "null")  false
         (= data "nil")  false
+        (= data "[]")  false
         :else true))
 
 (defn route-not-found-text "return a string with : No Service defined with the given path" [] 
