@@ -1,8 +1,8 @@
 (ns ring.commonrest 
-  (:use ring.util.response [clojure.string :only (trim lower-case) ])
+  (:use ring.util.response [clojure.string :only (trim lower-case)] )
   (:require [clj-json.core :as json]
-    [clojure.contrib.logging :as logging]
-    [clojure.contrib.io :as io]))
+            [clojure.contrib.logging :as logging]
+            [clojure.contrib.io :as io]))
 
 (defn json-response
   "Data is the http body, :status is optional httpcode, :etag is optional calculated etag value and content-type is ex. application/vnd.yoursee+json. :cache-control and :expires are optional" 
@@ -41,7 +41,23 @@
 (defn- handle-req [app req]
   (try (app req)
     (catch Exception e (do (logging/error "exp caught" e) (json-ex-response e 500)))
-    (catch AssertionError e (do (logging/error "assertion caught" e) (json-ex-response e (find-error-code e))))))
+    (catch AssertionError e (let 
+                               [trace (into-array StackTraceElement (merge [] (first (.getStackTrace e ))))]
+                              (.setStackTrace e trace)
+                              (logging/warn "assertion caught" e) 
+                              (json-ex-response e (find-error-code e))))))
+
+(defn filter-comm [opts data]
+      (apply str (filter #(not (nil? %)) (for [key opts] 
+                      (let [value (str (key data))]
+                         (if (not (empty?  value))
+                           (cond 
+                                (= key :body) (str "[" (name key) ": " 
+                                                   (if 
+                                                       (instance? java.io.InputStream (key data)) 
+                                                        nil
+                                                        value ) "]" )
+                                :else (str "[" (name key) ": " value "]" ))))))))
 
 (defn wrap-request-log-and-error-handling
   "Wrap an app such that exceptions thrown within the wrapped app are caught
@@ -49,15 +65,22 @@
   if the exception is an AssertionError, the messages string is parsed for a http-code (ex: 400,405...) se macro (chk [httpcode func] ).
   Other exceptions returns a http-code of 500.
   Futhermore any caught exception is logged as an Error, and all request and responses is logged as Debug.
+  optional keys for logging :  
+ 
+  :server-port :server-name :remote-addr :uri :query-string :scheme
+  :request-method :content-type :content-length :character-encoding
+  :headers :body :params :json-param 
+  
   "
-  [app]
-  (fn [{:keys [request-method uri json-params params] :as req}]
+  [app & opts]
+  (fn [{:keys [request-method uri] :as req}]
     (let [start (System/currentTimeMillis)
           resp (handle-req app req)
           finish (System/currentTimeMillis)
           total (- finish start)
-          ]
-      (reqlog "time (%dms)\n request-log %s %s - [json-parms:  %s ]- [params: %s] \n response-log %s " total request-method uri json-params params resp)
+          dump-req (filter-comm opts req) 
+          dump-resp (filter-comm opts resp)]
+      (reqlog "time (%dms)\n Request: %s %s \n Response: %s \n Req-dump:\n %s \n Resp-dump:\n %s" total (name request-method) uri (:status resp) dump-req dump-resp)
       resp)
     )
   )
