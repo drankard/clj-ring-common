@@ -30,7 +30,7 @@
     (logging/info line)))
 
 
-(defn- json-ex-response "returns a json response, if http-code is null, 400 is used." [exception httpcode]
+(defn json-ex-response "returns a json response, if http-code is null, 400 is used." [exception httpcode]
   (-> (response (str {:exception (str exception)}))
     (status (if (nil? httpcode) 400 (Integer/parseInt (trim httpcode))))
     (content-type "application/vnd.yousee.kasia2.error+json")))
