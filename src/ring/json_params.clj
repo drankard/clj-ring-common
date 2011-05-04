@@ -13,7 +13,7 @@
     (if-let [body (and (or (json-request? ((:headers req) "content-type")) 
                            (json-request? ((:headers req) "accept"))) (:body req))]
       (try 
-         (let [bstr (slurp body)
+         (let [bstr (if (instance? java.io.InputStream body) (slurp body) body)
             json-params (json/parse-string bstr)
             req* (assoc req
                    :json-params json-params
