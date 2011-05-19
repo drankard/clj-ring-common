@@ -1,4 +1,4 @@
-(defproject ring-common "1.1.0"
+(defproject ring-common "1.1.1"
   :description "Common wrappers for ring"
   :dependencies [[org.clojure/clojure "1.2.0"]
                  [org.clojure/clojure-contrib "1.2.0"]
