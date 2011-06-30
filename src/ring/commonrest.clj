@@ -21,7 +21,7 @@
    Limitation: Due to the way postwalk (and prewalk) walks the tree, it is not possible to
    remove nil values from inside lists."
   [data]
-  (postwalk #(if (map? %)
+  (walk/postwalk #(if (map? %)
 	       (filter-func %)
 	       %) data))
 
