@@ -51,9 +51,12 @@
   (let [line (apply format msg vals)]
     (logging/info line)))
 
+(defn- reqlog-debug [msg & vals]
+  (let [line (apply format msg vals)]
+    (logging/debug line)))
 
-(defn- json-ex-response "returns a json response, if http-code is null, 400 is used." [exception httpcode]
-  (-> (response (str {:exception (str exception)}))
+(defn json-ex-response "returns a json response, if http-code is null, 400 is used." [exception httpcode]
+  (-> (response (json/generate-string {:exception (str exception)}))
     (status (if (nil? httpcode) 400 (Integer/parseInt (trim httpcode))))
     (content-type "application/vnd.yousee.kasia2.error+json")))
 
@@ -102,7 +105,8 @@
           total (- finish start)
           dump-req (filter-comm opts req) 
           dump-resp (filter-comm opts resp)]
-      (reqlog "time (%dms)\n Request: %s %s \n Response: %s \n Req-dump:\n %s \n Resp-dump:\n %s" total (name request-method) uri (:status resp) dump-req dump-resp)
+      (reqlog "time (%dms)\n Request: %s %s \n Response: %s" total (name request-method) uri (:status resp))
+      (reqlog-debug "\nReq-dump:\n %s \n Resp-dump:\n %s"  dump-req dump-resp)
       resp)
     )
   )
