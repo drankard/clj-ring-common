@@ -2,12 +2,34 @@
   (:use ring.util.response [clojure.string :only (trim lower-case)] )
   (:require [clj-json.core :as json]
             [clojure.contrib.logging :as logging]
-            [clojure.contrib.io :as io]))
+            [clojure.contrib.io :as io]
+            [clojure.walk :as walk :only [postwalk]]))
+
+(defn- nil-or-empty? [val]
+  (or
+    (not val)
+    (and (string? val) (empty? val))
+    (and (coll? val) (empty? val))))
+
+(defn- filter-func
+"Helper function for (rm-all-nil-values). This function removes all nil entries in a map"
+  [data]
+  (into {} (remove #(nil-or-empty? (second %)) data)))
+
+(defn prune-tree
+  "Walks through the supplied data structure and remove nil or empty entries from the map.
+   Limitation: Due to the way postwalk (and prewalk) walks the tree, it is not possible to
+   remove nil values from inside lists."
+  [data]
+  (postwalk #(if (map? %)
+	       (filter-func %)
+	       %) data))
 
 (defn json-response
   "Data is the http body, :status is optional httpcode, :etag is optional calculated etag value and content-type is ex. application/vnd.yoursee+json. :cache-control and :expires are optional" 
   [data content-type & {:as attrs}] 
-  (let [res {:status (or (:status attrs) 200)
+  (let [data (prune-tree data)
+        res {:status (or (:status attrs) 200)
              :headers {"Content-Type" content-type 
                        "ETag" (str (if (:etag attrs) (:etag attrs) (hash data)))}
              :body (json/generate-string data)}
@@ -115,4 +137,7 @@
 
 (defn route-not-found-text "return a string with : No Service defined with the given path" [] 
   "No Service defined with the given path")
+
+
+
 
